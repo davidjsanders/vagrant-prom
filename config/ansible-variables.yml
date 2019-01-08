@@ -1,0 +1,11 @@
+ruser: vagrant
+passphrase: ThisIsIgnoredJ
+ca_server_ip: 192.168.60.6
+vpn_gw_ip: 192.168.60.5
+private_key_file: /Users/davidsanders/.ssh/azure-pk
+country: CA
+province: ON
+city: Guelph
+company: 2656396 Ontario Ltd
+email: david@davidjsanders.com
+orgunit: Information Technology

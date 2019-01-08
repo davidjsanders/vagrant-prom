@@ -1,0 +1,9 @@
+### docker.yml
+---
+- name: Start Docker service
+  become: true
+  service:
+    daemon-reload: yes
+    name: docker
+    state: started
+    enabled: yes

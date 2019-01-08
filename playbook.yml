@@ -1,0 +1,23 @@
+### gen-playbook.yml
+---
+- hosts: all_systems
+  vars_files:
+    - ./config/ansible-variables.yml
+  gather_facts: true
+  become: true
+
+  tasks:
+    - import_tasks: ansible/tasks/ping-hosts.yml
+    - import_tasks: ansible/tasks/yums.yml
+    - import_tasks: ansible/tasks/node.yml
+    - import_tasks: ansible/tasks/docker.yml
+
+- hosts: master
+  vars_files:
+    - ./config/ansible-variables.yml
+  gather_facts: false
+  become: true
+
+  tasks:
+    - import_tasks: ansible/tasks/prom.yml
+
