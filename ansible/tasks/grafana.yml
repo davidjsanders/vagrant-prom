@@ -1,0 +1,28 @@
+### grafana.yml
+---
+- name: Install Grafana
+  yum:
+    name:
+      - https://dl.grafana.com/oss/release/grafana-5.4.2-1.x86_64.rpm
+    state: present
+  tags:
+    - grafana
+
+- name: Copy Grafana ini file
+  copy:
+    src: config/grafana.ini
+    dest: /etc/grafana/grafana.ini
+    owner: vagrant
+    mode: u+rw,g+r,o+r
+  tags:
+    - grafana
+
+- name: Start Grafana
+  become: true
+  service:
+    daemon-reload: yes
+    name: grafana-server
+    state: restarted
+    enabled: yes
+  tags:
+    - grafana

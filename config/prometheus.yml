@@ -1,0 +1,32 @@
+global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+
+rule_files:
+  - alerting.yml
+
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+      - 127.0.0.1:9093
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+    - targets: ['sscisapp9:9090']
+  - job_name: 'node_exporter'
+    static_configs:
+    - targets: ['sscisapp9:9100','sscisapp10:9100','sscisapp11:9100','sscisapp12:9100','sscisapp13:9100','sscisapp14:9100','sscisapp15:9100','sscisapp16:9100']
+  - job_name: 'grafana'
+    static_configs:
+    - targets: ['sscisapp9:3000']
+  - job_name: 'docker'
+    static_configs:
+    - targets: ['sscisapp9:9323','sscisapp10:9323','sscisapp11:9323','sscisapp12:9323','sscisapp13:9323','sscisapp14:9323','sscisapp15:9323','sscisapp16:9323']
+  - job_name: 'cadvisor'
+    static_configs:
+    - targets: ['sscisapp9:8080','sscisapp10:8080','sscisapp11:8080','sscisapp12:8080','sscisapp13:8080','sscisapp14:8080','sscisapp15:8080','sscisapp16:8080']
+  # - job_name: 'traefik-docker'
+  #   static_configs:
+  #   - targets: ['127.0.0.1:8080']

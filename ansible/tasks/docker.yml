@@ -1,0 +1,15 @@
+### docker.yml
+---
+- name: Copy Docker daemon.json
+  copy:
+    src: ./config/daemon.json
+    dest: /etc/docker/daemon.json
+    owner: root
+
+- name: Start Docker service
+  become: true
+  service:
+    daemon-reload: yes
+    name: docker
+    state: started
+    enabled: yes

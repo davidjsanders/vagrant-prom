@@ -1,0 +1,96 @@
+### node.yml
+---
+- name: Create Prometheus user
+  user:
+    name: prometheus
+    create_home: yes
+    shell: /bin/false
+    state: present
+
+- name: Check if Prometheus installed
+  stat:
+    path: /usr/local/bin/prometheus
+  register: prom_installed
+
+- name: Check if Prometheus promtool installed
+  stat:
+    path: /usr/local/bin/promtool
+  register: promtool_installed
+
+- name: Get Prometheus 2.5
+  get_url:
+    url: https://github.com/prometheus/prometheus/releases/download/v2.5.0/prometheus-2.5.0.linux-amd64.tar.gz
+    dest: /tmp/
+  when: prom_installed.stat.exists == false
+
+- name: Unarchive Prometheus
+  unarchive:
+    src: /tmp/prometheus-2.5.0.linux-amd64.tar.gz
+    dest: /tmp/
+    remote_src: yes
+  when: prom_installed.stat.exists == false
+
+- name: Create Prometheus /etc/prometheus directory
+  file:
+    path: /etc/prometheus
+    state: directory
+    mode: 0755
+    owner: prometheus
+
+- name: Create Prometheus /var/lib/prometheus directory
+  file:
+    path: /var/lib/prometheus
+    state: directory
+    mode: 0755
+    owner: prometheus
+
+- name: Create Prometheus /home/prometheus/Prometheus/data directories
+  file:
+    path: /home/prometheus/Prometheus/data
+    state: directory
+    mode: 0755
+    owner: prometheus
+
+- name: Copy prometheus executable
+  copy:
+    src: /tmp/prometheus-2.5.0.linux-amd64/prometheus
+    dest: /usr/local/bin
+    remote_src: yes
+    owner: prometheus
+    mode: u+x,g+x,o+x
+  when: prom_installed.stat.exists == false
+
+- name: Copy promtool executable
+  copy:
+    src: /tmp/prometheus-2.5.0.linux-amd64/promtool
+    dest: /usr/local/bin
+    remote_src: yes
+    owner: prometheus
+    mode: u+x,g+x,o+x
+  when: promtool_installed.stat.exists == false
+
+- name: Copy Prometheus consoles
+  command: cp -r /tmp/prometheus-2.5.0.linux-amd64/consoles /etc/prometheus
+
+- name: Copy Prometheus console_libraries
+  command: cp -r /tmp/prometheus-2.5.0.linux-amd64/console_libraries /etc/prometheus
+
+- name: Copy Prometheus service definition
+  copy:
+    src: ./config/prometheus.service
+    dest: /etc/systemd/system/prometheus.service
+    owner: root
+
+- name: Copy Prometheus configuration
+  copy:
+    src: ./config/prometheus.yml
+    dest: /home/prometheus/prometheus.yml
+    owner: prometheus
+
+- name: Start Prometheus service
+  become: true
+  service:
+    daemon-reload: yes
+    name: prometheus
+    state: restarted
+    enabled: yes

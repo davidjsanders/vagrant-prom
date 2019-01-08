@@ -1,0 +1,74 @@
+### yums.yml
+---
+- name: Stat EPEL repo
+  stat: path="/etc/yum.repos.d/epel.repo"
+  register: epel_repo
+  tags:
+    - yums
+ 
+- name: Add repository
+  yum_repository:
+    name: epel
+    description: EPEL YUM repo
+    baseurl: https://download.fedoraproject.org/pub/epel/$releasever/$basearch/
+  when: epel_repo.stat.exists == false
+  tags:
+    - yums
+
+- name: Import EPEL GPG key
+  rpm_key:
+    key: "https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}"
+    state: present
+  when: epel_repo.stat.exists == false
+  tags:
+    - yums
+
+- name: Install the latest version of Docker pre-requisites
+  yum:
+    name:
+      - atomic-registries
+      - audit-libs-python
+      - container-selinux
+      - containers-common
+      - container-storage-setup
+      - checkpolicy
+      - device-mapper-persistent-data 
+      - libcgroup
+      - libsemanage-python
+      - libyaml
+      - lvm2
+      - oci-register-machine
+      - oci-systemd-hook
+      - oci-umount
+      - policycoreutils-python
+      - python-pip
+      - python-IPy
+      - python-backports
+      - python-backports-ssl_match_hostname
+      - python-ipaddress
+      - python-setuptools
+      - python-pytoml
+      - PyYAML
+      - subscription-manager-rhsm-certificates
+      - setools-libs
+      - yajl
+      - yum-utils 
+    state: present
+  tags:
+    - yums
+
+- name: Install Docker
+  yum:
+    name:
+      - docker
+      - docker-common
+      - docker-client 
+    state: present
+  tags:
+    - yums
+
+- name: Pip install Docker requirements for Python
+  pip:
+    name: docker-py
+  tags:
+    - yums

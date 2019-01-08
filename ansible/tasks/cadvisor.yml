@@ -1,0 +1,39 @@
+### cadvisor.yml
+---
+- name: Pull cAdvisor image
+  docker_image:
+    name: google/cadvisor
+    tag: v0.31.0
+
+- name: Start cAdvisor
+  docker_container:
+    name: cadvisor
+    image: google/cadvisor:v0.31.0
+    state: started
+    devices:
+      - "/:/rootfs:ro"
+      - "/var/run:/var/run:rw"
+      - "/sys:/sys:ro"
+      - "/var/lib/docker/:/var/lib/docker:ro"
+      - "/cgroup:/cgroup:ro"
+      - "/cgroup:/sys/fs/cgroup:ro"
+    ports:
+     - "8080:8080"
+    privileged: yes
+    detach: yes
+
+    # docker run \
+    #     -p 8080:8080 \
+    #     --restart=always \
+    #     --privileged=true  \
+    #     --volume=/:/rootfs:ro   \
+    #     --volume=/var/run:/var/run:rw   \
+    #     --volume=/sys:/sys:ro   \
+    #     --volume=/var/lib/docker/:/var/lib/docker:ro   \
+    #     --volume=/cgroup:/cgroup:ro \
+    #     --volume=/cgroup:/sys/fs/cgroup:ro  \
+    #     --detach=true   \
+    #     --network ${2} \
+    #     --name=${job_name}   \
+    #     --privileged=true   \
+    #     docker-registry.gwl.bz:18080/google/cadvisor:v0.31.0 
