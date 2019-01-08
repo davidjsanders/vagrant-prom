@@ -1,5 +1,32 @@
 ### grafana.yml
 ---
+- name: Create Grafana user
+  user:
+    name: grafana
+    create_home: yes
+    shell: /bin/false
+    state: present
+  tags:
+    - grafana
+
+- name: Create Grafana /etc/grafana directory
+  file:
+    path: /etc/grafana
+    state: directory
+    mode: 0755
+    owner: grafana
+  tags:
+    - grafana
+
+- name: Create Grafana /var/lib/grafana directory
+  file:
+    path: /var/lib/grafana
+    state: directory
+    mode: 0755
+    owner: grafana
+  tags:
+    - grafana
+
 - name: Install Grafana
   yum:
     name:
@@ -8,11 +35,47 @@
   tags:
     - grafana
 
+- name: Copy Dashboards
+  copy:
+    src: config/grafana-setup/dashboards
+    dest: /var/lib/grafana
+    owner: grafana
+    mode: u+rw,g+r,o+r
+  tags:
+    - grafana
+
+- name: Copy Provisioning
+  copy:
+    src: config/grafana-setup/provisioning
+    dest: /etc/grafana
+    owner: grafana
+    mode: u+rw,g+r,o+r
+  tags:
+    - grafana
+
+- file:
+    src: /var/lib/grafana
+    dest: /usr/share/grafana/data
+    owner: grafana
+    group: grafana
+    state: link
+  tags:
+    - grafana
+
+- file:
+    src: /var/log/grafana
+    dest: /usr/share/grafana/data/logs
+    owner: grafana
+    group: grafana
+    state: link
+  tags:
+    - grafana
+
 - name: Copy Grafana ini file
   copy:
-    src: config/grafana.ini
+    src: config/grafana-setup/grafana.ini
     dest: /etc/grafana/grafana.ini
-    owner: vagrant
+    owner: grafana
     mode: u+rw,g+r,o+r
   tags:
     - grafana
