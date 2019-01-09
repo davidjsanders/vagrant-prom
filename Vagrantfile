@@ -7,22 +7,28 @@ prefix="sscisapp"
 Vagrant.configure("2") do |config|
   config.vm.box = "centos/7"
 
-  config.vm.define "sscisapp9-vm", primary: true do |sscisapp9|
-    sscisapp9.vm.network "forwarded_port", guest: 22, host: 2209
-    sscisapp9.vm.network "forwarded_port", guest: 3000, host: 20901
-    sscisapp9.vm.network "forwarded_port", guest: 9090, host: 20902
-    sscisapp9.vm.network "forwarded_port", guest: 8080, host: 20903
-    sscisapp9.vm.network "forwarded_port", guest: 9100, host: 20904
-      sscisapp9.vm.hostname = "#{prefix}9"
-    sscisapp9.vm.network "private_network", ip: "10.70.0.9"
-  end
+  # config.vm.define "sscisapp9-vm", primary: true do |sscisapp9|
+  #   sscisapp9.vm.network "forwarded_port", guest: 22, host: 2209
+  #   sscisapp9.vm.network "forwarded_port", guest: 3000, host: 20901
+  #   sscisapp9.vm.network "forwarded_port", guest: 9090, host: 20902
+  #   sscisapp9.vm.network "forwarded_port", guest: 8080, host: 20903
+  #   sscisapp9.vm.network "forwarded_port", guest: 9100, host: 20904
+  #     sscisapp9.vm.hostname = "#{prefix}9"
+  #   sscisapp9.vm.network "private_network", ip: "10.70.0.9"
+  # end
 
   N=12
-  (10..N).each do |machine_id|
+  (9..N).each do |machine_id|
     config.vm.define "sscisapp#{machine_id}-vm" do |node|
-        node.vm.network "forwarded_port", guest: 22, host: "22#{machine_id}"
-        # node.vm.network "forwarded_port", guest: 8080, host: "2#{machine_id}03"
-        # node.vm.network "forwarded_port", guest: 9100, host: "2#{machine_id}04"
+        if machine_id == 9
+          node.vm.network "forwarded_port", guest: 22, host: "2209"
+          node.vm.network "forwarded_port", guest: 3000, host: 23000
+          node.vm.network "forwarded_port", guest: 9090, host: 29090
+          node.vm.network "forwarded_port", guest: 8080, host: 28080
+          node.vm.network "forwarded_port", guest: 9100, host: 29100
+        else
+          node.vm.network "forwarded_port", guest: 22, host: "22#{machine_id}"
+        end
         node.vm.hostname = "#{prefix}#{machine_id}"
         node.vm.network "private_network", ip: "10.70.0.#{machine_id}"
     end

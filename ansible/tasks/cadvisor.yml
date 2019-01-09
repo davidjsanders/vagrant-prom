@@ -4,6 +4,8 @@
   docker_image:
     name: google/cadvisor
     tag: v0.31.0
+  tags:
+  - cadvisor
 
 - name: Start cAdvisor
   docker_container:
@@ -21,6 +23,8 @@
      - "8080:8080"
     privileged: yes
     detach: yes
+  tags:
+  - cadvisor
 
     # docker run \
     #     -p 8080:8080 \

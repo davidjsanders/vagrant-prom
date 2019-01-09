@@ -6,22 +6,30 @@
     create_home: yes
     shell: /bin/false
     state: present
+  tags:
+  - node_exporter
 
 - name: Check if Node Exporter installed
   stat:
     path: /usr/local/bin/node_exporter
   register: node_installed
+  tags:
+  - node_exporter
 
 - name: Check Node Exporter textfile collector path
   stat:
     path: /var/lib/node_exporter/textfile_collector/
   register: textfile
+  tags:
+  - node_exporter
 
 - name: Get Node Exporter
   get_url:
     url: https://github.com/prometheus/node_exporter/releases/download/v0.17.0/node_exporter-0.17.0.linux-amd64.tar.gz
     dest: /tmp/node_exporter-0.17.0.linux-amd64.tar.gz
   when: node_installed.stat.exists == false
+  tags:
+  - node_exporter
 
 - name: Unarchive Node Exporter
   unarchive:
@@ -29,6 +37,8 @@
     dest: /tmp/
     remote_src: yes
   when: node_installed.stat.exists == false
+  tags:
+  - node_exporter
 
 - name: Copy files
   copy:
@@ -38,6 +48,8 @@
     owner: node_exporter
     mode: u+x,g+x,o+x
   when: node_installed.stat.exists == false
+  tags:
+  - node_exporter
 
 - name: Create textfile collector directory
   file:
@@ -45,18 +57,24 @@
     state: directory
     owner: node_exporter
   when: textfile.stat.exists == false
+  tags:
+  - node_exporter
 
 - name: Copy node exporter service definition
   copy:
     src: ./config/node.service
     dest: /etc/systemd/system/node.service
     owner: root
+  tags:
+  - node_exporter
 
 - name: Copy machine info metric to Node
   copy:
     src: ./config/metadata.prom
     dest: /var/lib/node_exporter/textfile_collector/
     owner: root
+  tags:
+  - node_exporter
 
 - name: Start node exporter service
   become: true
@@ -65,6 +83,8 @@
     name: node
     state: restarted
     enabled: yes
+  tags:
+  - node_exporter
 
 #   - name: Init Node Exporter on Workers
 #     hosts: docker_workers

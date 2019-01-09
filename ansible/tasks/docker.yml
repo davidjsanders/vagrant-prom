@@ -5,6 +5,8 @@
     src: ./config/daemon.json
     dest: /etc/docker/daemon.json
     owner: root
+  tags:
+  - docker
 
 - name: Start Docker service
   become: true
@@ -13,3 +15,5 @@
     name: docker
     state: started
     enabled: yes
+  tags:
+  - docker
